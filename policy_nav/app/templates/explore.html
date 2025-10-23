@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PolicyNav - Explore Policies</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans">
+
+<header class="bg-blue-700 text-white p-4 flex flex-col md:flex-row justify-between items-center shadow-md">
+    <h1 class="text-3xl font-bold">PolicyNav</h1>
+    <nav class="mt-2 md:mt-0 space-x-4">
+        <a href="/" class="hover:underline hover:text-gray-200">Home</a>
+        <a href="/categories" class="hover:underline hover:text-gray-200">Categories</a>
+        <a href="/explore" class="hover:underline hover:text-gray-200">Explore</a>
+        <a href="/about" class="hover:underline hover:text-gray-200">About</a>
+    </nav>
+</header>
+
+<main class="container mx-auto mt-8 px-4">
+
+    <!-- Search & Filters -->
+    <div class="mb-8">
+        <form action="/explore_search" method="post" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+            <input type="text" name="query" placeholder="Search policies..." 
+                   value="{{ query }}" 
+                   class="col-span-2 p-3 rounded shadow border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            
+            <select name="state" class="p-3 rounded shadow border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">All States</option>
+                {% for s in states %}
+                    <option value="{{ s }}" {% if selected_state == s %}selected{% endif %}>{{ s }}</option>
+                {% endfor %}
+            </select>
+
+            <select name="category" class="p-3 rounded shadow border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">All Categories</option>
+                {% for c in categories %}
+                    <option value="{{ c }}" {% if selected_category == c %}selected{% endif %}>{{ c }}</option>
+                {% endfor %}
+            </select>
+
+            <input type="number" name="year" placeholder="Year" 
+                   value="{{ selected_year }}" 
+                   class="p-3 rounded shadow border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+            <button type="submit" class="bg-blue-700 text-white p-3 rounded shadow hover:bg-blue-800">Search</button>
+        </form>
+    </div>
+
+    <!-- Results -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% if results %}
+            {% for policy in results %}
+            <div class="bg-white rounded-xl shadow hover:shadow-2xl p-4 transition duration-300">
+                <h3 class="font-bold text-lg text-blue-700 hover:underline">
+                    <a href="/policy/{{ policy.policy_id }}">{{ policy.title }}</a>
+                </h3>
+                <p class="text-gray-600 mt-1 text-sm">State: {{ policy.state }} | Year: {{ policy.year }} | Category: {{ policy.category }}</p>
+                <p class="text-gray-700 mt-2 text-sm">{{ policy.summary }}</p>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p class="col-span-full text-gray-700 text-center">No policies found.</p>
+        {% endif %}
+    </div>
+
+</main>
+</body>
+</html>

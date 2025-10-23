@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PolicyNav - {{ policy.title }}</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans">
+
+<header class="bg-blue-700 text-white p-4 flex justify-between items-center shadow-md">
+    <h1 class="text-2xl font-bold">PolicyNav</h1>
+    <nav class="space-x-4">
+        <a href="/" class="hover:underline">Home</a>
+        <a href="/categories" class="hover:underline">Categories</a>
+        <a href="/explore" class="hover:underline">Explore</a>
+        <a href="/about" class="hover:underline">About</a>
+    </nav>
+</header>
+
+<main class="container mx-auto mt-8 px-4">
+
+    <!-- Policy Basic Info -->
+    <div class="bg-white rounded-xl shadow p-6 mb-6">
+        <h2 class="text-3xl font-bold text-blue-700">{{ policy.title }}</h2>
+        <p class="text-gray-600 mt-1">State: {{ policy.state }} | Category: {{ policy.category }} | Year: {{ policy.year }}</p>
+        <p class="text-gray-700 mt-4">{{ policy.full_text }}</p>
+    </div>
+
+    <!-- AI Panel -->
+    <div class="bg-white p-4 rounded shadow mb-6">
+        <h3 class="font-semibold mb-2">AI Explanation</h3>
+        <p id="ai-summary">{{ policy.ai_summary or "AI summary not available." }}</p>
+        <button id="explain-more" class="mt-2 p-2 bg-blue-700 text-white rounded hover:bg-blue-800">Explain More</button>
+    </div>
+
+    <!-- Charts -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+
+        <!-- Keyword Histogram -->
+        <div class="bg-white p-4 rounded shadow">
+            <h3 class="font-semibold mb-2">Keyword Histogram</h3>
+            <div id="keyword-hist" style="height:300px;"></div>
+        </div>
+
+        <!-- Target Audience -->
+        <div class="bg-white p-4 rounded shadow">
+            <h3 class="font-semibold mb-2">Target Audience</h3>
+            <div id="audience-chart" style="height:300px;"></div>
+        </div>
+    </div>
+
+    <!-- Similar Policies -->
+    <h3 class="font-semibold mt-6 mb-2">Compare With Similar Policies</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {% for similar in similar_policies %}
+        <div class="bg-white p-4 rounded shadow">
+            <h4><a href="/policy/{{ similar.policy_id }}" class="hover:underline text-blue-700">{{ similar.title }}</a></h4>
+            <p class="text-gray-600 mt-1">State: {{ similar.state }} | Year: {{ similar.year }}</p>
+        </div>
+        {% endfor %}
+    </div>
+
+</main>
+
+<script>
+    // Keyword Histogram
+    var keywords = {{ keyword_chart | tojson | safe }};
+    Plotly.newPlot('keyword-hist', [{
+        x: Object.keys(keywords),
+        y: Object.values(keywords),
+        type: 'bar',
+        marker: {color: '#2563EB'}
+    }], {responsive:true, margin:{t:20,b:40}});
+
+    // Target Audience Chart
+    var audience = {{ audience_chart | tojson | safe }};
+    Plotly.newPlot('audience-chart', [{
+        x: Object.keys(audience),
+        y: Object.values(audience),
+        type: 'bar',
+        marker: {color: '#F59E0B'}
+    }], {responsive:true, margin:{t:20,b:40}});
+
+    // AI Explain More Button (dummy fetch, replace with your endpoint)
+    document.getElementById('explain-more').addEventListener('click', async () => {
+        let response = await fetch('/ollama_explain/{{ policy.policy_id }}');
+        let data = await response.json();
+        document.getElementById('ai-summary').innerText = data.explanation;
+    });
+</script>
+
+</body>
+</html>

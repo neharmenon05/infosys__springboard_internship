@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PolicyNav - Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wordcloud2.js/1.1.1/wordcloud2.min.js"></script>
+
+</head>
+<body class="bg-gray-100 font-sans">
+
+<!-- Header -->
+<header class="bg-blue-700 text-white p-4 flex flex-col md:flex-row justify-between items-center shadow-md">
+    <h1 class="text-3xl font-bold">PolicyNav</h1>
+    <nav class="mt-2 md:mt-0 space-x-4">
+        <a href="/" class="hover:underline hover:text-gray-200">Home</a>
+        <a href="/categories" class="hover:underline hover:text-gray-200">Categories</a>
+        <a href="/explore" class="hover:underline hover:text-gray-200">Explore</a>
+        <a href="/about" class="hover:underline hover:text-gray-200">About</a>
+        <a href="/quantum_ner" class="hover:underline hover:text-gray-200">Quantum NER</a>
+    </nav>
+</header>
+
+<main class="container mx-auto mt-8 px-4">
+
+    <!-- Overview Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white p-6 rounded-xl shadow hover:shadow-xl transition duration-300">
+            <h3 class="text-lg font-semibold text-gray-700 mb-2">Total Policies</h3>
+            <p class="text-3xl font-bold text-blue-700">{{ total_policies }}</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow hover:shadow-xl transition duration-300">
+            <h3 class="text-lg font-semibold text-gray-700 mb-2">Categories</h3>
+            <div id="category-chart"></div>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow hover:shadow-xl transition duration-300">
+            <h3 class="text-lg font-semibold text-gray-700 mb-2">States</h3>
+            <div id="state-chart"></div>
+        </div>
+    </div>
+
+    <!-- Recently Added Policies -->
+    <h2 class="text-2xl font-bold mb-4">Recently Added Policies</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        {% for policy in recently_added %}
+        <div class="bg-white rounded-xl shadow hover:shadow-2xl p-4 transition duration-300">
+            <h3 class="font-bold text-lg text-blue-700 hover:underline"><a href="/policy/{{ policy.policy_id }}">{{ policy.title }}</a></h3>
+            <p class="text-gray-600 mt-1 text-sm">State: {{ policy.state }} | Year: {{ policy.year }} | Category: {{ policy.category }}</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <h2 class="text-2xl font-bold mb-4">Word Cloud of Frequent Terms</h2>
+    <div class="bg-white rounded-xl shadow p-6 flex justify-center">
+        <!-- Correct path to static folder -->
+        <img src="/static/wordcloud.png" alt="Word Cloud" class="w-full h-auto" />
+</div>
+
+</main>
+
+<script>
+    // Categories Pie Chart
+    var categories = JSON.parse('{{ categories | tojson | safe }}');
+    Plotly.newPlot('category-chart', [{
+        values: Object.values(categories),
+        labels: Object.keys(categories),
+        type: 'pie',
+        marker: { colors: ['#1E40AF','#2563EB','#3B82F6','#60A5FA','#93C5FD'] }
+    }], {responsive:true, margin:{t:0,b:0,l:0,r:0}});
+
+    // States Bar Chart
+    var states = JSON.parse('{{ states | tojson | safe }}');
+    Plotly.newPlot('state-chart', [{
+        x: Object.keys(states),
+        y: Object.values(states),
+        type: 'bar',
+        marker: { color: '#3B82F6' }
+    }], {responsive:true, margin:{t:0,b:0,l:0,r:0}});
+    
+</script>
+
+</body>
+</html>

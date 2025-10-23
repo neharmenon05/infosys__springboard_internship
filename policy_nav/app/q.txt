@@ -1,0 +1,167 @@
+## 📁 1. `quantum_model.py`
+
+```python
+import pennylane as qml
+from pennylane import numpy as np
+import pandas as pd
+import hashlib
+import joblib
+import os
+
+# ---------------- Config ---------------- #
+N_QUBITS = 4
+DATA_PATH = "data/schemes.csv"
+MODEL_PATH = "models/quantum_vqc_weights.pkl"
+dev = qml.device("default.qubit", wires=N_QUBITS)
+
+# ---------------- Embedding ---------------- #
+def text_to_angles(text):
+    tokens = text.lower().split()
+    angles = np.zeros(N_QUBITS)
+    for i in range(min(len(tokens), N_QUBITS)):
+        h = int(hashlib.md5(tokens[i].encode()).hexdigest(), 16)
+        angles[i] = (h % 1000) / 1000 * np.pi
+    return angles
+
+# ---------------- Quantum Circuit ---------------- #
+@qml.qnode(dev)
+def circuit(inputs, weights):
+    for i in range(N_QUBITS):
+        qml.RY(inputs[i], wires=i)
+    for i in range(N_QUBITS):
+        qml.RY(weights[i], wires=i)
+        qml.CNOT(wires=[i, (i+1)%N_QUBITS])
+    return qml.expval(qml.PauliZ(0))
+
+def predict_score(text, weights):
+    angles = text_to_angles(text)
+    return (circuit(angles, weights) + 1) / 2  # Normalize to [0, 1]
+
+# ---------------- Training ---------------- #
+def train_quantum_model():
+    df = pd.read_csv(DATA_PATH)
+    df['title'] = df['title'].fillna('').astype(str)
+    df['full_text'] = df['full_text'].fillna('').astype(str)
+    df['label'] = df['full_text'].str.contains("education", case=False).astype(int)
+
+    X = [text_to_angles(f"{row['title']} {row['full_text']}") for _, row in df.iterrows()]
+    Y = df['label'].values
+
+    weights = np.random.uniform(0, np.pi, N_QUBITS, requires_grad=True)
+    opt = qml.GradientDescentOptimizer(stepsize=0.2)
+
+    for epoch in range(20):
+        loss = lambda w: np.mean([(circuit(x, w) - y)**2 for x, y in zip(X, Y)])
+        weights = opt.step(loss, weights)
+        print(f"Epoch {epoch+1}: Loss = {loss(weights):.4f}")
+
+    joblib.dump(weights, MODEL_PATH)
+    print(f"Quantum model saved to {MODEL_PATH}")
+
+# ---------------- Inference ---------------- #
+def load_model():
+    return joblib.load(MODEL_PATH)
+
+def classify_policy(text, threshold=0.6):
+    weights = load_model()
+    score = predict_score(text, weights)
+    return score if score > threshold else None
+```
+
+---
+
+## 📁 2. `main.py`
+
+```python
+from fastapi import FastAPI, Request, Form
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+import pandas as pd
+
+from quantum_model import classify_policy
+
+app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
+
+df = pd.read_csv("data/schemes.csv")
+df['title'] = df['title'].fillna('').astype(str)
+df['full_text'] = df['full_text'].fillna('').astype(str)
+
+@app.get("/", response_class=HTMLResponse)
+async def home(request: Request):
+    return templates.TemplateResponse("quantum_ner.html", {"request": request})
+
+@app.post("/quantum_ner", response_class=HTMLResponse)
+async def quantum_ner_post(request: Request, query: str = Form(...)):
+    threshold = 0.6
+    results = []
+
+    for _, row in df.iterrows():
+        text = f"{row['title']} {row['full_text']}"
+        score = classify_policy(text, threshold)
+        if score:
+            results.append({
+                "policy_id": row["policy_id"],
+                "title": row["title"],
+                "full_text": row["full_text"],
+                "state": row["state"],
+                "year": row["year"],
+                "category": row["category"],
+                "status": row["status"],
+                "region": row["region"],
+                "score": round(float(score), 3)
+            })
+
+    return templates.TemplateResponse("quantum_ner.html", {
+        "request": request,
+        "query": query,
+        "answers": results
+    })
+```
+
+---
+
+## 📁 3. `templates/quantum_ner.html`
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Quantum Policy Search</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-6 font-sans">
+    <h1 class="text-3xl font-bold mb-6">Quantum Policy Search</h1>
+
+    <form action="/quantum_ner" method="post" class="mb-8 flex gap-2">
+        <input type="text" name="query" placeholder="Enter your policy query..." class="flex-grow p-3 border rounded shadow-sm">
+        <button type="submit" class="p-3 bg-blue-700 text-white rounded hover:bg-blue-800">Search</button>
+    </form>
+
+    {% if answers %}
+    <h2 class="text-2xl font-semibold mb-4">Matching Policies:</h2>
+    <div class="grid gap-4">
+        {% for policy in answers %}
+        <div class="bg-white p-4 rounded shadow">
+            <h3 class="font-bold text-blue-700 text-lg">{{ policy.title }}</h3>
+            <p class="text-gray-600 text-sm">
+                Score: {{ policy.score }} |
+                ID: {{ policy.policy_id }} |
+                State: {{ policy.state }} |
+                Category: {{ policy.category }} |
+                Year: {{ policy.year }} |
+                Status: {{ policy.status }} |
+                Region: {{ policy.region }}
+            </p>
+            <p class="text-gray-700 mt-2">{{ policy.full_text }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</body>
+</html>
+```
+

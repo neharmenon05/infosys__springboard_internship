@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PolicyNav - Categories</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans">
+
+<!-- Header -->
+<header class="bg-blue-700 text-white p-4 flex flex-col md:flex-row justify-between items-center shadow-md">
+    <h1 class="text-3xl font-bold">PolicyNav</h1>
+    <nav class="mt-2 md:mt-0 space-x-4">
+        <a href="/" class="hover:underline hover:text-gray-200">Home</a>
+        <a href="/categories" class="hover:underline hover:text-gray-200">Categories</a>
+        <a href="/explore" class="hover:underline hover:text-gray-200">Explore</a>
+        <a href="/about" class="hover:underline hover:text-gray-200">About</a>
+    </nav>
+</header>
+
+<main class="container mx-auto mt-8 px-4">
+
+    <h2 class="text-2xl font-bold mb-4">Browse Policies by Category</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
+        {% for category in categories %}
+        <div class="bg-white rounded-xl shadow hover:shadow-2xl p-6 flex flex-col justify-between">
+            <h3 class="text-lg font-bold text-blue-700 mb-4">{{ category }}</h3>
+            <a href="/explore?category={{ category }}" 
+               class="bg-blue-700 text-white py-2 px-4 rounded hover:bg-blue-800 text-center">
+               View {{ category }} Policies
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+
+</main>
+
+</body>
+</html>
