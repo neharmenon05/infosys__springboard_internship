@@ -1,6 +1,6 @@
-Task 2:
+### TASK 2
 
-DATE
+**DATE**
 1) Creating FASTAPI connection [9/7/2025]
 2) Connecting it to HTML [10/7/2025]
 
