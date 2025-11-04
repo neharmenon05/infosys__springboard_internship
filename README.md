@@ -14,3 +14,14 @@ This repository contains all the tasks completed during the Infosys Springboard 
 | Task 4 | AI Integration           |  AI-powered policy question–answering assistant built with LangChain, FAISS, and LM Studio          | ✅ Done   | [Task 4 Folder](./AI) |
 
 
+## General Overview 
+
+The tasks are designed to:  
+- Strengthen foundational knowledge of AI/ML concepts  
+- Provide hands-on experience in building and deploying APIs  
+- Explore integrated platforms for policy navigation and quantum computing basics  
+- Develop AI-powered assistants using modern frameworks and libraries  
+
+By following through the tasks, one can trace the journey from basic concepts to practical applications and real-world integrations. The repository serves as both a learning record and a reference guide for future projects.  
+
+**Refer to each subfolder for more details about individual tasks, including code, documentation, and outputs.**
