@@ -1,5 +1,3 @@
-# infosys__springboard_intership
-
 This repository contains all the tasks completed during the Infosys Springboard Internship program. Each task is documented with its objective, approach, and outcomes.
 
 ---
@@ -12,6 +10,7 @@ This repository contains all the tasks completed during the Infosys Springboard 
 | Task 2  | FastAPI Project                | Building and deploying APIs                      | ✅ Done | [Task 2 Folder](./task_2) |
 | Task 3  | Integrated Platform           | Policy navigation,visulaization and Basic Quantam using Pennylane              | ✅ Done   | [Task 3 Folder](./policy_nav) |
 | Task 4 | AI Integration           |  AI-powered policy question–answering assistant built with LangChain, FAISS, and LM Studio          | ✅ Done   | [Task 4 Folder](./AI) |
+| Task 5 | VOice to text         |  Voice‑to‑text policy assistant built with Web Speech API, Chart.js, and Flask for intelligent search and visualization         | ✅ Done   | [Task 5 Folder](./voice_to_text) |
 
 
 ## General Overview 
