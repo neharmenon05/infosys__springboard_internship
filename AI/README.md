@@ -1,4 +1,4 @@
-# 📘 Policy RAG Assistant (AI Module)
+# Policy RAG Assistant (AI Module)
 
 > **Submodule:** `ai/` — AI-powered Policy Question Answering System using LM Studio, LangChain, and FAISS  
 
