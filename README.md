@@ -25,6 +25,7 @@ The tasks are designed to:
 By following through the tasks, one can trace the journey from basic concepts to practical applications and real-world integrations. The repository serves as both a learning record and a reference guide for future projects.  
 
 **Refer to each subfolder for more details about individual tasks, including code, documentation, and outputs.**
+
 ---
 
 ## Team Project GitHub Links
@@ -34,3 +35,4 @@ For the **team project version** that consolidates and extends these tasks, plea
 - [Team Project Repository — Quantam_Infosys](https://github.com/neharmenon05/Quantam_Infosys)
 - [Team Project Repository —Voice‑to‑Text Infosys](https://github.com/DRAVINAS/voice-to-text-infosys)  
 - [Team Project Repository —LLM Assistant Module](https://github.com/Yateesh0313/LLM_Infosys)  
+---
