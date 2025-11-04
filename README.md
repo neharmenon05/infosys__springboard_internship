@@ -33,4 +33,4 @@ For the **team project version** that consolidates and extends these tasks, plea
 
 - [Team Project Repository — Quantam_Infosys](https://github.com/neharmenon05/Quantam_Infosys)
 - [Team Project Repository —Voice‑to‑Text Infosys](https://github.com/DRAVINAS/voice-to-text-infosys)  
-- [Team Project Repository —LLM Assistant Module]([https://github.com/YateeshRepoLinkHere](https://github.com/Yateesh0313/LLM_Infosys)  
+- [Team Project Repository —LLM Assistant Module](https://github.com/YateeshRepoLinkHere](https://github.com/Yateesh0313/LLM_Infosys)  
