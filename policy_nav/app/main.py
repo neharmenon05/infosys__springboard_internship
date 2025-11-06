@@ -69,8 +69,14 @@ def safe_unique(column_name):
     return []
 
 # ---------------- Home Page ---------------- #
+from fastapi.responses import RedirectResponse
+
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
+    # 🔒 Require login before showing the dashboard
+    if "user" not in request.session:
+        return RedirectResponse("/login", status_code=303)
+
     if df is None:
         return HTMLResponse(content="<h1>Data not loaded!</h1>", status_code=500)
 
@@ -78,7 +84,11 @@ async def home(request: Request):
     categories = safe_value_counts("category")
     states = safe_value_counts("state")
     years = safe_value_counts("year")
-    recently_added = df.sort_values("year", ascending=False).head(5).to_dict("records") if "full_text" in df.columns else []
+    recently_added = (
+        df.sort_values("year", ascending=False).head(5).to_dict("records")
+        if "full_text" in df.columns
+        else []
+    )
 
     # Ensure wordcloud_words is always a list
     wordcloud_words = []
@@ -86,20 +96,29 @@ async def home(request: Request):
         try:
             wordcloud_words = [
                 {"text": word, "weight": int(count)}
-                for word, count in df["full_text"].str.split(expand=True).stack().value_counts().head(50).items()
+                for word, count in (
+                    df["full_text"]
+                    .str.split(expand=True)
+                    .stack()
+                    .value_counts()
+                    .head(50)
+                    .items()
+                )
             ]
         except Exception:
             wordcloud_words = []
 
+    # 👇 Include username in template context
     return templates.TemplateResponse("index.html", {
         "request": request,
+        "user": request.session.get("user"),
         "total_policies": total_policies,
         "categories": categories,
         "states": states,
         "years": years,
         "recently_added": recently_added,
         "wordcloud_words": wordcloud_words,
-        "results": None  # No search bar on home
+        "results": None
     })
 
 # ---------------- Search ---------------- #
@@ -267,3 +286,77 @@ async def quantum_ner_post(request: Request, query: str = Form(...)):
 @app.get("/about", response_class=HTMLResponse)
 async def about(request: Request):
     return templates.TemplateResponse("about.html", {"request": request})
+
+
+import json, os
+from fastapi import FastAPI, Request, Form
+from fastapi.responses import HTMLResponse, RedirectResponse
+from starlette.middleware.sessions import SessionMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+
+app.add_middleware(SessionMiddleware, secret_key="supersecretkey")
+
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
+templates = Jinja2Templates(directory="app/templates")
+
+USERS_FILE = "app/data/users.json"
+
+# ------------- Helper functions -------------
+def load_users():
+    if not os.path.exists(USERS_FILE):
+        with open(USERS_FILE, "w") as f:
+            json.dump([], f)
+    with open(USERS_FILE, "r") as f:
+        return json.load(f)
+
+def save_users(users):
+    with open(USERS_FILE, "w") as f:
+        json.dump(users, f, indent=4)
+
+# ------------- AUTH ROUTES -------------
+
+@app.get("/login", response_class=HTMLResponse)
+async def login_page(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request, "error": None})
+
+@app.post("/login", response_class=HTMLResponse)
+async def login_post(request: Request, username: str = Form(...), password: str = Form(...)):
+    users = load_users()
+    for user in users:
+        if user["username"] == username and user["password"] == password:
+            request.session["user"] = username
+            return RedirectResponse("/", status_code=303)
+    return templates.TemplateResponse("login.html", {"request": request, "error": "Invalid credentials"})
+
+@app.get("/register", response_class=HTMLResponse)
+async def register_page(request: Request):
+    return templates.TemplateResponse("register.html", {"request": request, "error": None})
+
+@app.post("/register", response_class=HTMLResponse)
+async def register_post(request: Request, username: str = Form(...), email: str = Form(...), password: str = Form(...)):
+    users = load_users()
+    if any(u["username"] == username for u in users):
+        return templates.TemplateResponse("register.html", {"request": request, "error": "Username already exists"})
+    users.append({"username": username, "email": email, "password": password})
+    save_users(users)
+    return RedirectResponse("/login", status_code=303)
+
+@app.get("/forgot_password", response_class=HTMLResponse)
+async def forgot_password_page(request: Request):
+    return templates.TemplateResponse("forgot_password.html", {"request": request, "message": None, "error": None})
+
+@app.post("/forgot_password", response_class=HTMLResponse)
+async def forgot_password_post(request: Request, email: str = Form(...), new_password: str = Form(...)):
+    users = load_users()
+    for user in users:
+        if user["email"] == email:
+            user["password"] = new_password
+            save_users(users)
+            return templates.TemplateResponse("forgot_password.html", {"request": request, "message": "Password updated successfully!", "error": None})
+    return templates.TemplateResponse("forgot_password.html", {"request": request, "error": "Email not found", "message": None})
+
+@app.get("/logout")
+async def logout(request: Request):
+    request.session.clear()
+    return RedirectResponse("/login", status_code=303)
