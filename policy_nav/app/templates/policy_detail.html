@@ -1,94 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PolicyNav - {{ policy.title }}</title>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PolicyNav - {{ policy.title }}</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100 font-sans">
+<body class="bg-cover bg-center min-h-screen font-sans flex flex-col" 
+      style="background-image: url('https://static.vecteezy.com/system/resources/previews/009/362/398/original/blue-dynamic-shape-abstract-background-suitable-for-web-and-mobile-app-backgrounds-eps-10-vector.jpg');">
 
-<header class="bg-blue-700 text-white p-4 flex justify-between items-center shadow-md">
-    <h1 class="text-2xl font-bold">PolicyNav</h1>
-    <nav class="space-x-4">
-        <a href="/" class="hover:underline">Home</a>
-        <a href="/categories" class="hover:underline">Categories</a>
-        <a href="/explore" class="hover:underline">Explore</a>
-        <a href="/about" class="hover:underline">About</a>
-    </nav>
+<!-- Header -->
+<header class="bg-blue-800 bg-opacity-80 text-white p-4 flex justify-between items-center shadow-md">
+  <h1 class="text-2xl font-extrabold tracking-wide">PolicyNav</h1>
+  <nav class="space-x-6 text-lg">
+    <a href="/" class="hover:text-yellow-300 transition">Home</a>
+    <a href="/categories" class="hover:text-yellow-300 transition">Categories</a>
+    <a href="/explore" class="hover:text-yellow-300 transition">Explore</a>
+    <a href="/about" class="hover:text-yellow-300 transition">About</a>
+  </nav>
 </header>
 
-<main class="container mx-auto mt-8 px-4">
+<!-- Main Content -->
+<main class="container mx-auto mt-10 px-6 flex-grow">
 
-    <!-- Policy Basic Info -->
-    <div class="bg-white rounded-xl shadow p-6 mb-6">
-        <h2 class="text-3xl font-bold text-blue-700">{{ policy.title }}</h2>
-        <p class="text-gray-600 mt-1">State: {{ policy.state }} | Category: {{ policy.category }} | Year: {{ policy.year }}</p>
-        <p class="text-gray-700 mt-4">{{ policy.full_text }}</p>
+  <!-- Policy Basic Info -->
+  <div class="bg-white bg-opacity-90 backdrop-blur-sm rounded-xl shadow-lg p-8 mb-8 transition transform hover:-translate-y-1 hover:shadow-2xl duration-300">
+    <h2 class="text-3xl font-bold text-blue-700 mb-2">{{ policy.title }}</h2>
+    <p class="text-gray-600 text-sm mb-4">State: {{ policy.state }} | Category: {{ policy.category }} | Year: {{ policy.year }}</p>
+    <p class="text-gray-700 leading-relaxed text-justify">{{ policy.full_text }}</p>
+  </div>
+
+  <!-- Charts -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+    <!-- Keyword Histogram -->
+    <div class="bg-white bg-opacity-90 backdrop-blur-sm rounded-xl shadow-lg p-6 transition hover:shadow-xl">
+      <h3 class="text-xl font-semibold text-blue-700 mb-3">Keyword Histogram</h3>
+      <div id="keyword-hist" style="height:300px;"></div>
     </div>
 
-    <!-- AI Panel -->
-    <div class="bg-white p-4 rounded shadow mb-6">
-        <h3 class="font-semibold mb-2">AI Explanation</h3>
-        <p id="ai-summary">{{ policy.ai_summary or "AI summary not available." }}</p>
-        <button id="explain-more" class="mt-2 p-2 bg-blue-700 text-white rounded hover:bg-blue-800">Explain More</button>
+    <!-- Target Audience -->
+    <div class="bg-white bg-opacity-90 backdrop-blur-sm rounded-xl shadow-lg p-6 transition hover:shadow-xl">
+      <h3 class="text-xl font-semibold text-blue-700 mb-3">Target Audience</h3>
+      <div id="audience-chart" style="height:300px;"></div>
     </div>
+  </div>
 
-    <!-- Charts -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-
-        <!-- Keyword Histogram -->
-        <div class="bg-white p-4 rounded shadow">
-            <h3 class="font-semibold mb-2">Keyword Histogram</h3>
-            <div id="keyword-hist" style="height:300px;"></div>
-        </div>
-
-        <!-- Target Audience -->
-        <div class="bg-white p-4 rounded shadow">
-            <h3 class="font-semibold mb-2">Target Audience</h3>
-            <div id="audience-chart" style="height:300px;"></div>
-        </div>
+  <!-- Similar Policies -->
+  <h3 class="text-2xl font-bold text-white mb-6 drop-shadow-lg">Compare With Similar Policies</h3>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    {% for similar in similar_policies %}
+    <div class="bg-white bg-opacity-90 backdrop-blur-sm rounded-xl shadow-lg p-6 transition hover:shadow-xl">
+      <h4 class="font-semibold text-blue-700 mb-2 hover:underline">
+        <a href="/policy/{{ similar.policy_id }}">{{ similar.title }}</a>
+      </h4>
+      <p class="text-gray-600 text-sm">State: {{ similar.state }} | Year: {{ similar.year }}</p>
     </div>
-
-    <!-- Similar Policies -->
-    <h3 class="font-semibold mt-6 mb-2">Compare With Similar Policies</h3>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {% for similar in similar_policies %}
-        <div class="bg-white p-4 rounded shadow">
-            <h4><a href="/policy/{{ similar.policy_id }}" class="hover:underline text-blue-700">{{ similar.title }}</a></h4>
-            <p class="text-gray-600 mt-1">State: {{ similar.state }} | Year: {{ similar.year }}</p>
-        </div>
-        {% endfor %}
-    </div>
+    {% endfor %}
+  </div>
 
 </main>
 
+<!-- Footer -->
+<footer class="bg-blue-800 bg-opacity-80 text-white text-center py-4 shadow-inner mt-10">
+  <p class="text-sm">&copy; 2025 PolicyNav. All rights reserved.</p>
+</footer>
+
 <script>
-    // Keyword Histogram
-    var keywords = {{ keyword_chart | tojson | safe }};
-    Plotly.newPlot('keyword-hist', [{
-        x: Object.keys(keywords),
-        y: Object.values(keywords),
-        type: 'bar',
-        marker: {color: '#2563EB'}
-    }], {responsive:true, margin:{t:20,b:40}});
+  // Keyword Histogram
+  var keywords = {{ keyword_chart | tojson | safe }};
+  Plotly.newPlot('keyword-hist', [{
+      x: Object.keys(keywords),
+      y: Object.values(keywords),
+      type: 'bar',
+      marker: {color: '#2563EB'}
+  }], {responsive:true, margin:{t:20,b:40}});
 
-    // Target Audience Chart
-    var audience = {{ audience_chart | tojson | safe }};
-    Plotly.newPlot('audience-chart', [{
-        x: Object.keys(audience),
-        y: Object.values(audience),
-        type: 'bar',
-        marker: {color: '#F59E0B'}
-    }], {responsive:true, margin:{t:20,b:40}});
+  // Target Audience Chart
+  var audience = {{ audience_chart | tojson | safe }};
+  Plotly.newPlot('audience-chart', [{
+      x: Object.keys(audience),
+      y: Object.values(audience),
+      type: 'bar',
+      marker: {color: '#F59E0B'}
+  }], {responsive:true, margin:{t:20,b:40}});
 
-    // AI Explain More Button (dummy fetch, replace with your endpoint)
-    document.getElementById('explain-more').addEventListener('click', async () => {
-        let response = await fetch('/ollama_explain/{{ policy.policy_id }}');
-        let data = await response.json();
-        document.getElementById('ai-summary').innerText = data.explanation;
-    });
 </script>
 
 </body>

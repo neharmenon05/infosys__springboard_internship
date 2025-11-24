@@ -1,89 +1,170 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PolicyNav - Home</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/wordcloud2.js/1.1.1/wordcloud2.min.js"></script>
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PolicyNav - Home</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    /* Carousel styles */
+    .carousel {
+      position: relative;
+      overflow: hidden;
+    }
+    .carousel-track {
+      display: flex;
+      transition: transform 0.6s ease-in-out;
+    }
+    .carousel-item {
+      flex: 0 0 33.3333%; /* 3 tiles visible */
+      box-sizing: border-box;
+      padding: 1rem;
+    }
+    .carousel-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0,0,0,0.4);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      border-radius: 0.25rem;
+    }
+    .carousel-btn.left { left: 10px; }
+    .carousel-btn.right { right: 10px; }
+  </style>
 </head>
-<body class="bg-gray-100 font-sans">
+<body class="font-sans flex flex-col min-h-screen relative">
 
-<!-- Header -->
-<header class="bg-blue-700 text-white p-4 flex flex-col md:flex-row justify-between items-center shadow-md">
-  <h1 class="text-3xl font-bold">PolicyNav</h1>
-  <nav class="mt-2 md:mt-0 space-x-4 flex items-center">
-    <a href="/" class="hover:underline hover:text-gray-200">Home</a>
-    <a href="/categories" class="hover:underline hover:text-gray-200">Categories</a>
-    <a href="/explore" class="hover:underline hover:text-gray-200">Explore</a>
-    <a href="/about" class="hover:underline hover:text-gray-200">About</a>
-    <a href="/quantum_ner" class="hover:underline hover:text-gray-200">Quantum NER</a>
-    {% if user %}
-      <span class="ml-4 text-sm">👤 {{ user }}</span>
-      <a href="/logout" class="ml-2 text-red-200 hover:underline">Logout</a>
-    {% endif %}
-  </nav>
-</header>
+  <!-- Background Image Holder -->
+  <div class="absolute inset-0">
+    <img src="https://static.vecteezy.com/system/resources/previews/009/362/398/original/blue-dynamic-shape-abstract-background-suitable-for-web-and-mobile-app-backgrounds-eps-10-vector.jpg" 
+         alt="Background design" 
+         class="w-full h-full object-cover" />
+    <div class="absolute inset-0 bg-blue-900/40"></div>
+  </div>
 
+  <!-- Page Content -->
+  <div class="relative z-10 flex flex-col min-h-screen">
 
-<main class="container mx-auto mt-8 px-4">
+    <!-- Hero Header -->
+    <header class="bg-gradient-to-r from-blue-900 to-blue-700 bg-opacity-80 text-white py-10 shadow-lg">
+      <div class="max-w-7xl mx-auto text-center">
+        <h1 class="text-5xl font-extrabold tracking-tight mb-3">PolicyNav</h1>
+        <p class="text-xl text-blue-100 italic">Transparent. Accessible. Actionable insights into government policies.</p>
+        <nav class="mt-6 space-x-8 text-lg font-medium">
+          <a href="/" class="hover:text-yellow-300 transition">Home</a>
+          <a href="/categories" class="hover:text-yellow-300 transition">Categories</a>
+          <a href="/explore" class="hover:text-yellow-300 transition">Explore</a>
+          <a href="/about" class="hover:text-yellow-300 transition">About</a>
+          <a href="/quantum_ner" class="hover:text-yellow-300 transition">Quantum NER</a>
+          {% if user %}
+            <span class="ml-4 text-sm">👤 {{ user }}</span>
+            <a href="/logout" class="ml-2 text-red-200 hover:underline">Logout</a>
+          {% endif %}
+        </nav>
+      </div>
+    </header>
 
-    <!-- Overview Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div class="bg-white p-6 rounded-xl shadow hover:shadow-xl transition duration-300">
-            <h3 class="text-lg font-semibold text-gray-700 mb-2">Total Policies</h3>
-            <p class="text-3xl font-bold text-blue-700">{{ total_policies }}</p>
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto mt-12 px-6 flex-grow">
+
+      <!-- Overview Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+        <div class="bg-white bg-opacity-90 backdrop-blur-sm p-8 rounded-xl shadow-lg hover:shadow-2xl transition text-center">
+          <h3 class="text-xl font-semibold text-gray-700 mb-2">Total Policies</h3>
+          <p class="text-5xl font-extrabold text-blue-700">{{ total_policies }}</p>
         </div>
-        <div class="bg-white p-6 rounded-xl shadow hover:shadow-xl transition duration-300">
-            <h3 class="text-lg font-semibold text-gray-700 mb-2">Categories</h3>
-            <div id="category-chart"></div>
+        <div class="bg-white bg-opacity-90 backdrop-blur-sm p-8 rounded-xl shadow-lg hover:shadow-2xl transition">
+          <h3 class="text-xl font-semibold text-gray-700 mb-4 text-center">Policies by Category</h3>
+          <div id="category-chart" class="h-80"></div>
         </div>
-        <div class="bg-white p-6 rounded-xl shadow hover:shadow-xl transition duration-300">
-            <h3 class="text-lg font-semibold text-gray-700 mb-2">States</h3>
-            <div id="state-chart"></div>
+        <div class="bg-white bg-opacity-90 backdrop-blur-sm p-8 rounded-xl shadow-lg hover:shadow-2xl transition">
+          <h3 class="text-xl font-semibold text-gray-700 mb-4 text-center">Policies by State</h3>
+          <div id="state-chart" class="h-80"></div>
         </div>
-    </div>
+      </div>
 
-    <!-- Recently Added Policies -->
-    <h2 class="text-2xl font-bold mb-4">Recently Added Policies</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        {% for policy in recently_added %}
-        <div class="bg-white rounded-xl shadow hover:shadow-2xl p-4 transition duration-300">
-            <h3 class="font-bold text-lg text-blue-700 hover:underline"><a href="/policy/{{ policy.policy_id }}">{{ policy.title }}</a></h3>
-            <p class="text-gray-600 mt-1 text-sm">State: {{ policy.state }} | Year: {{ policy.year }} | Category: {{ policy.category }}</p>
+      <!-- Recently Added Policies Carousel -->
+      <h2 class="text-3xl font-bold text-white mb-6 drop-shadow-lg">Recently Added Policies</h2>
+      <div class="carousel bg-white bg-opacity-90 backdrop-blur-sm rounded-xl shadow-lg mb-12">
+        <div class="carousel-track">
+          {% for policy in recently_added %}
+          <div class="carousel-item">
+            <div class="bg-white rounded-xl shadow p-6 hover:shadow-xl transition transform hover:-translate-y-1">
+              <h3 class="font-bold text-lg text-blue-700 mb-2 hover:underline">
+                <a href="/policy/{{ policy.policy_id }}">{{ policy.title }}</a>
+              </h3>
+              <p class="text-gray-600 text-sm mb-2">State: {{ policy.state }} | Year: {{ policy.year }} | Category: {{ policy.category }}</p>
+            </div>
+          </div>
+          {% endfor %}
         </div>
-        {% endfor %}
-    </div>
+        <button class="carousel-btn left" onclick="moveSlide(-1)">&#10094;</button>
+        <button class="carousel-btn right" onclick="moveSlide(1)">&#10095;</button>
+      </div>
 
-    <h2 class="text-2xl font-bold mb-4">Word Cloud of Frequent Terms</h2>
-    <div class="bg-white rounded-xl shadow p-6 flex justify-center">
-        <!-- Correct path to static folder -->
-        <img src="/static/wordcloud.png" alt="Word Cloud" class="w-full h-auto" />
-</div>
+      <!-- Word Cloud -->
+      <h2 class="text-3xl font-bold text-white mb-6 drop-shadow-lg">Word Cloud of Frequent Terms</h2>
+      <div class="bg-white bg-opacity-90 backdrop-blur-sm rounded-xl shadow-lg p-6 flex justify-center">
+        <img src="/static/wordcloud.png" alt="Word Cloud" class="w-full h-auto rounded" />
+      </div>
 
-</main>
+    </main>
 
+    <!-- Footer -->
+    <footer class="bg-blue-900 bg-opacity-80 text-white text-center py-4 shadow-inner">
+      <p class="text-sm">&copy; 2025 PolicyNav. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+<!-- Scripts -->
 <script>
-    // Categories Pie Chart
-    var categories = JSON.parse('{{ categories | tojson | safe }}');
-    Plotly.newPlot('category-chart', [{
-        values: Object.values(categories),
-        labels: Object.keys(categories),
-        type: 'pie',
-        marker: { colors: ['#1E40AF','#2563EB','#3B82F6','#60A5FA','#93C5FD'] }
-    }], {responsive:true, margin:{t:0,b:0,l:0,r:0}});
+  // Charts with proper margins
+  var categories = JSON.parse('{{ categories | tojson | safe }}');
+  Plotly.newPlot('category-chart', [{
+    values: Object.values(categories),
+    labels: Object.keys(categories),
+    type: 'pie',
+    textinfo: 'label+percent',
+    hoverinfo: 'label+value',
+    marker: { colors: ['#1E40AF','#2563EB','#3B82F6','#60A5FA','#93C5FD'] }
+  }], {
+    responsive: true,
+    margin: { t: 60, b: 60, l: 60, r: 60 },
+    title: { text: 'Categories Distribution', font: { size: 18 } }
+  });
 
-    // States Bar Chart
-    var states = JSON.parse('{{ states | tojson | safe }}');
-    Plotly.newPlot('state-chart', [{
-        x: Object.keys(states),
-        y: Object.values(states),
-        type: 'bar',
-        marker: { color: '#3B82F6' }
-    }], {responsive:true, margin:{t:0,b:0,l:0,r:0}});
-    
+  var states = JSON.parse('{{ states | tojson | safe }}');
+  Plotly.newPlot('state-chart', [{
+    x: Object.keys(states),
+    y: Object.values(states),
+    type: 'bar',
+    marker: { color: '#3B82F6' }
+  }], {
+    responsive: true,
+    margin: { t: 60, b: 80, l: 80, r: 40 },
+    title: { text: 'Policies by State', font: { size: 18 } }
+  });
+
+  // Carousel logic
+  let currentIndex = 0;
+  const track = document.querySelector('.carousel-track');
+  const items = document.querySelectorAll('.carousel-item');
+  const totalItems = items.length;
+
+  function moveSlide(direction) {
+    currentIndex += direction;
+    if (currentIndex < 0) currentIndex = totalItems - 3;
+    if (currentIndex > totalItems - 3) currentIndex = 0;
+    track.style.transform = `translateX(-${currentIndex * (100/3)}%)`;
+  }
+
+  // Auto-slide every 5 seconds
+  setInterval(() => moveSlide(1), 5000);
 </script>
 
 </body>

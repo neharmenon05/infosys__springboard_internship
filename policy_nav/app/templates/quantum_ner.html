@@ -1,58 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Quantum NER - PolicyNav</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>Quantum NER - PolicyNav</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100 font-sans p-6">
+<body class="font-sans min-h-screen relative">
 
-    <h1 class="text-3xl font-bold mb-6">Quantum NER & Policy Q/A</h1>
+  <!-- Background Image Holder -->
+  <div class="absolute inset-0">
+    <img src="https://static.vecteezy.com/system/resources/previews/009/362/398/original/blue-dynamic-shape-abstract-background-suitable-for-web-and-mobile-app-backgrounds-eps-10-vector.jpg" 
+         alt="Background design" 
+         class="w-full h-full object-cover" />
+    <div class="absolute inset-0 bg-blue-900/40"></div>
+  </div>
 
-    <!-- Query Form -->
-    <form action="/quantum_ner" method="post" class="mb-8 flex gap-2">
-        <input type="text" name="query" placeholder="Ask a policy question..." class="flex-grow p-3 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-        <button type="submit" class="p-3 bg-blue-700 text-white rounded hover:bg-blue-800">Analyze</button>
-    </form>
+  <!-- Page Content -->
+  <div class="relative z-10 flex flex-col min-h-screen">
 
-    <!-- Matching Policies -->
-    {% if answers %}
-    <h2 class="text-2xl font-semibold mb-4">Matching Policies:</h2>
-    <div class="grid gap-4">
+    <!-- Hero Header -->
+    <header class="bg-gradient-to-r from-blue-900 to-blue-700 bg-opacity-80 text-white py-8 shadow-lg">
+      <div class="max-w-5xl mx-auto text-center">
+        <h1 class="text-4xl font-extrabold tracking-tight mb-2">Quantum NER & Policy Q/A</h1>
+        <p class="text-lg text-blue-100 italic">Ask questions, discover policies, and extract entities with AI precision.</p>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-5xl mx-auto p-6 flex-grow">
+
+      <!-- Query Form -->
+      <form action="/quantum_ner" method="post" class="mb-10 flex gap-3">
+        <input type="text" name="query" placeholder="Ask a policy question..." 
+               class="flex-grow p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <button type="submit" 
+                class="px-6 py-3 bg-blue-700 text-white rounded-lg shadow hover:bg-blue-800 transition">
+          Analyze
+        </button>
+      </form>
+
+      <!-- Matching Policies -->
+      {% if answers %}
+      <h2 class="text-2xl font-semibold mb-6 text-white drop-shadow-lg">Matching Policies</h2>
+      <div class="grid md:grid-cols-2 gap-6">
         {% for policy in answers %}
-        <div class="bg-white p-4 rounded shadow">
-            <h3 class="font-bold text-blue-700 text-lg">
-                <a href="/policy/{{ policy.policy_id }}" class="hover:underline">{{ policy.title }}</a>
-            </h3>
-            <p class="text-gray-600 text-sm mt-1">State: {{ policy.state }} | Category: {{ policy.category }} | Year: {{ policy.year }}</p>
-            <p class="text-gray-700 mt-2">{{ policy.full_text[:300] }}{% if policy.full_text|length > 300 %}...{% endif %}</p>
+        <div class="bg-white bg-opacity-90 backdrop-blur-sm p-6 rounded-xl shadow hover:shadow-lg transition">
+          <h3 class="font-bold text-blue-700 text-lg mb-2">
+            <a href="/policy/{{ policy.policy_id }}" class="hover:underline">{{ policy.title }}</a>
+          </h3>
+          <p class="text-gray-600 text-sm mb-2">State: {{ policy.state }} | Category: {{ policy.category }} | Year: {{ policy.year }}</p>
+          <p class="text-gray-700 text-sm leading-relaxed">
+            {{ policy.full_text[:300] }}{% if policy.full_text|length > 300 %}...{% endif %}
+          </p>
         </div>
         {% endfor %}
-    </div>
-    {% endif %}
+      </div>
+      {% endif %}
 
-    <!-- Quantum NER Results -->
-    {% if entities %}
-    <h2 class="text-2xl font-semibold mt-8 mb-4">Quantum NER Results:</h2>
-    <div class="overflow-x-auto">
-        <table class="min-w-full bg-white border rounded shadow">
-            <thead class="bg-gray-200">
-                <tr>
-                    <th class="border p-2 text-left">Entity</th>
-                    <th class="border p-2 text-left">Score</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for i in range(entities|length) %}
-                <tr class="hover:bg-gray-50">
-                    <td class="border p-2">{{ entities[i] }}</td>
-                    <td class="border p-2">{{ scores[i] }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
+      <!-- Quantum NER Results -->
+      {% if entities %}
+      <h2 class="text-2xl font-semibold mt-12 mb-6 text-white drop-shadow-lg">Quantum NER Results</h2>
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white bg-opacity-90 backdrop-blur-sm border rounded-xl shadow">
+          <thead class="bg-blue-100">
+            <tr>
+              <th class="border p-3 text-left font-semibold text-gray-700">Entity</th>
+              <th class="border p-3 text-left font-semibold text-gray-700">Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for i in range(entities|length) %}
+            <tr class="hover:bg-gray-50 transition">
+              <td class="border p-3 text-gray-800">{{ entities[i] }}</td>
+              <td class="border p-3 text-gray-800">{{ scores[i] }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
         </table>
-    </div>
-    {% endif %}
+      </div>
+      {% endif %}
+
+    </main>
+
+    <!-- Fixed Footer -->
+    <footer class="fixed bottom-0 left-0 w-full bg-blue-900 bg-opacity-80 text-white text-center py-4 shadow-inner">
+      <p class="text-sm">&copy; 2025 PolicyNav. All rights reserved.</p>
+    </footer>
+
+  </div>
 
 </body>
 </html>

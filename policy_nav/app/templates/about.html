@@ -5,44 +5,68 @@
     <title>PolicyNav - About</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100">
+<body class="bg-cover bg-center min-h-screen font-sans" 
+      style="background-image: url('https://static.vecteezy.com/system/resources/previews/009/362/398/original/blue-dynamic-shape-abstract-background-suitable-for-web-and-mobile-app-backgrounds-eps-10-vector.jpg');">
 
-<header class="bg-blue-700 text-white p-4 flex justify-between">
-    <h1 class="text-2xl font-bold">PolicyNav</h1>
-    <nav class="space-x-4">
-        <a href="/" class="hover:underline">Home</a>
-        <a href="/categories" class="hover:underline">Categories</a>
-        <a href="/explore" class="hover:underline">Explore</a>
-        <a href="/about" class="hover:underline">About</a>
+<header class="bg-blue-800 bg-opacity-80 text-white shadow-md p-4 flex justify-between items-center">
+    <h1 class="text-3xl font-extrabold tracking-wide">PolicyNav</h1>
+    <nav class="space-x-6 text-lg">
+        <a href="/" class="hover:text-yellow-300 transition">Home</a>
+        <a href="/categories" class="hover:text-yellow-300 transition">Categories</a>
+        <a href="/explore" class="hover:text-yellow-300 transition">Explore</a>
+        <a href="/about" class="hover:text-yellow-300 transition">About</a>
     </nav>
 </header>
 
-<main class="container mx-auto mt-8">
-    <h2 class="text-xl font-semibold mb-4">About PolicyNav</h2>
-    <p class="mb-4">PolicyNav is an AI-powered platform to explore and understand Indian government schemes.  
-    It combines NLP semantic search, AI summarization (via Ollama), and Quantum predictions to give actionable insights on policies.</p>
+<main class="container mx-auto mt-10 px-6 grid gap-8 md:grid-cols-2">
 
-    <h3 class="font-semibold mb-2">Tech Stack</h3>
-    <ul class="list-disc pl-6 mb-4">
-        <li>Backend: FastAPI, SQLAlchemy, Pydantic</li>
-        <li>Frontend: TailwindCSS, Plotly.js, WordCloud2.js</li>
-        <li>NLP: Sentence Transformers, Ollama (local inference)</li>
-        <li>Quantum Module: Qiskit, PennyLane (QCNN/QSVC predictions)</li>
-        <li>Database: SQLite (dev), Postgres (prod)</li>
-    </ul>
+    <!-- About Section -->
+    <div class="bg-white bg-opacity-90 shadow-lg rounded-lg p-8">
+        <h2 class="text-2xl font-bold text-blue-700 mb-4 border-b pb-2">About PolicyNav</h2>
+        <p class="text-gray-700 leading-relaxed">
+            PolicyNav is an AI-powered platform to explore and understand Indian government schemes.  
+            It combines NLP semantic search, AI summarization, and Quantum predictions to give actionable insights on policies.
+        </p>
+    </div>
 
-    <h3 class="font-semibold mb-2">Mission</h3>
-    <p class="mb-4">Make government policies transparent, accessible, and searchable with AI-powered insights.</p>
+    <!-- Tech Stack Section -->
+    <div class="bg-white bg-opacity-90 shadow-lg rounded-lg p-8">
+        <h3 class="text-xl font-semibold text-blue-700 mb-3">Tech Stack</h3>
+        <ul class="list-disc pl-6 space-y-2 text-gray-700">
+            <li>Backend: FastAPI, SQLAlchemy, Pydantic</li>
+            <li>Frontend: TailwindCSS, Plotly.js, WordCloud2.js</li>
+            <li>NLP: Sentence Transformers</li>
+            <li>Quantum Module: Qiskit, PennyLane (QCNN/QSVC predictions)</li>
+            <li>Database: SQLite (dev), Postgres (prod)</li>
+        </ul>
+    </div>
 
-    <h3 class="font-semibold mb-2">Contact</h3>
-    <ul class="list-disc pl-6 mb-4">
-        <li>GitHub: <a href="https://github.com/neharmenon05/infosys__springboard_internship" class="text-blue-700 hover:underline">Repo Link</a></li>
-        <li>LinkedIn: <a href="https://www.linkedin.com/" class="text-blue-700 hover:underline">Connect</a></li>
-        <li>Email: <a href="mailto:youremail@example.com" class="text-blue-700 hover:underline">youremail@example.com</a></li>
-    </ul>
+    <!-- Mission Section -->
+    <div class="bg-white bg-opacity-90 shadow-lg rounded-lg p-8">
+        <h3 class="text-xl font-semibold text-blue-700 mb-3">Mission</h3>
+        <p class="text-gray-700 leading-relaxed">
+            Make government policies transparent, accessible, and searchable with AI-powered insights.
+        </p>
+    </div>
 
-    <h3 class="font-semibold mb-2">Developer Credits</h3>
-    <p>Built by Nehar Menon & contributors.</p>
+    <!-- Contact Section -->
+    <div class="bg-white bg-opacity-90 shadow-lg rounded-lg p-8">
+        <h3 class="text-xl font-semibold text-blue-700 mb-3">Contact</h3>
+        <ul class="list-disc pl-6 space-y-2 text-gray-700">
+            <li>GitHub: <a href="https://github.com/neharmenon05/infosys__springboard_internship" class="text-blue-600 hover:text-blue-800 font-medium">Repo Link</a></li>
+        </ul>
+    </div>
+
+    <!-- Developer Credits Section -->
+    <div class="bg-white bg-opacity-90 shadow-lg rounded-lg p-8 md:col-span-2">
+        <h3 class="text-xl font-semibold text-blue-700 mb-3">Developer Credits</h3>
+        <p class="text-gray-700">Built by <span class="font-medium">Nehar Menon</span> & contributors.</p>
+    </div>
 </main>
+
+<footer class="mt-12 bg-blue-800 bg-opacity-80 text-white text-center py-4 shadow-inner">
+    <p class="text-sm">&copy; 2025 PolicyNav. All rights reserved.</p>
+</footer>
+
 </body>
 </html>

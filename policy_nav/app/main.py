@@ -149,6 +149,8 @@ async def search(request: Request, query: str = Form(...)):
 # ---------------- Categories ---------------- #
 @app.get("/categories", response_class=HTMLResponse)
 async def categories_page(request: Request):
+    if "user" not in request.session:
+        return RedirectResponse("/login", status_code=303)
     categories = safe_value_counts("category")
     return templates.TemplateResponse("categories.html", {
         "request": request,
@@ -158,6 +160,8 @@ async def categories_page(request: Request):
 # ---------------- Explore ---------------- #
 @app.get("/explore", response_class=HTMLResponse)
 async def explore_page(request: Request, category: Optional[str] = None):
+    if "user" not in request.session:
+        return RedirectResponse("/login", status_code=303)
     filtered_results = []
     if df is not None and category:
         filtered_results = df[df['category'] == category].to_dict('records')
@@ -246,6 +250,8 @@ async def quantum_ner_page(request: Request):
 
 @app.post("/quantum_ner", response_class=HTMLResponse)
 async def quantum_ner_post(request: Request, query: str = Form(...)):
+    if "user" not in request.session:
+        return RedirectResponse("/login", status_code=303)
     if not query:
         return HTMLResponse("<h1>Query is required!</h1>", 400)
 
@@ -285,6 +291,8 @@ async def quantum_ner_post(request: Request, query: str = Form(...)):
 # ---------------- About ---------------- #
 @app.get("/about", response_class=HTMLResponse)
 async def about(request: Request):
+    if "user" not in request.session:
+        return RedirectResponse("/login", status_code=303)
     return templates.TemplateResponse("about.html", {"request": request})
 
 
