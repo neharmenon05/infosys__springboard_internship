@@ -38,9 +38,6 @@ venv\Scripts\activate           # Windows
 ```
 
 ### 2. Install Dependencies
-```bash
-pip install -r requirements.txt
-```
 
 ### 3. Run the Notebook
 ```bash

@@ -47,7 +47,7 @@ pip install fastapi uvicorn jinja2
 
 ### 3. Run the Application
 ```bash
-uvicorn main:app --reload
+uvicorn main:main --reload
 ```
 
 ### 4. Access in Browser
